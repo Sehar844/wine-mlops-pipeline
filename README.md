@@ -14,7 +14,7 @@ The pipeline includes:
 - Stratified train-test splitting
 - Multiple Random Forest and Gradient Boosting configurations
 - 5-fold Stratified Cross-Validation
-- MLflow experiment tracking
+- MLflow experiment tracking and model comparison
 - MLflow model logging and registry
 - Model evaluation on a held-out test set
 - Automated quality gates
