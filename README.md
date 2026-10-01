@@ -14,8 +14,7 @@ The pipeline includes:
 - Stratified train-test splitting
 - Multiple Random Forest and Gradient Boosting configurations
 - 5-fold Stratified Cross-Validation
-- MLflow experiment tracking with MLflow model registry
-- MLflow model logging and registry
+- MLflow experiment tracking, model comparison, and model registry
 - Model evaluation on a held-out test set
 - Automated quality gates
 - GitHub Actions CI
@@ -59,4 +58,5 @@ wine-mlops-pipeline/
 ├── Makefile
 ├── requirements.txt
 └── README.md
+
 
