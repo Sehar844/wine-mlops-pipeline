@@ -1,30 +1,58 @@
 import time
 
-import mlflow.sklearn
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import f1_score
+from sklearn.model_selection import StratifiedKFold, cross_val_predict
 
 from src.data import load_wine_data, split_data
 
 
-MODEL_URI = "models:/WineClassifier@champion"
+RANDOM_STATE = 42
 
 
-def load_model_and_test_data():
-    X, y = load_wine_data()
-    _, X_test, _, y_test = split_data(X, y)
-
-    model = mlflow.sklearn.load_model(MODEL_URI)
-
-    return model, X_test, y_test
+def build_model():
+    return RandomForestClassifier(
+        n_estimators=100,
+        max_depth=5,
+        random_state=RANDOM_STATE,
+    )
 
 
 def test_validation_macro_f1_gate():
-    validation_macro_f1 = 0.9789
+    X, y = load_wine_data()
+    X_train, _, y_train, _ = split_data(X, y)
+
+    model = build_model()
+
+    cv = StratifiedKFold(
+        n_splits=5,
+        shuffle=True,
+        random_state=RANDOM_STATE,
+    )
+
+    predictions = cross_val_predict(
+        model,
+        X_train,
+        y_train,
+        cv=cv,
+        method="predict",
+    )
+
+    validation_macro_f1 = f1_score(
+        y_train,
+        predictions,
+        average="macro",
+    )
 
     assert validation_macro_f1 >= 0.88
 
 
 def test_batch_inference_latency_gate():
-    model, X_test, _ = load_model_and_test_data()
+    X, y = load_wine_data()
+    X_train, X_test, y_train, _ = split_data(X, y)
+
+    model = build_model()
+    model.fit(X_train, y_train)
 
     start_time = time.perf_counter()
 
@@ -39,7 +67,11 @@ def test_batch_inference_latency_gate():
 
 
 def test_prediction_classes_gate():
-    model, X_test, _ = load_model_and_test_data()
+    X, y = load_wine_data()
+    X_train, X_test, y_train, _ = split_data(X, y)
+
+    model = build_model()
+    model.fit(X_train, y_train)
 
     predictions = model.predict(X_test)
 
